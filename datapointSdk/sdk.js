@@ -122,6 +122,16 @@ const Sdk = (params) => {
       }
     });
   };
+  // function to get all datapoints descriptions
+  self.getAllDatapointDescriptions = _ => {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(self.store.descriptions.slice());
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
 
   // function to get datapoint object. Example: .datapoint(1).getValue();
   self.findDatapoint = id => {
