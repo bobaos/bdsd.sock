@@ -21,10 +21,11 @@ Field <DATA> is stringified JSON object which shoud match next format:
 
 This requirement applies to all messages both from the Server to Client, and from the Server to Client.
 
-* **id** field should be unique at the moment of sending and it is responsibility of client to 
+* **id** field should be unique at the moment of sending and it is responsibility of client to process this value.
 
 * **method** field client side
  *  {id: id, method: 'set value', payload {id: number (1-1000), value: value(depends)}}. response: {id: id, success: Bool}
  *  {id: id, method: 'get value', payload {id: number}. response: {id: id, success: Bool, payload: {id: number (1-1000), value: value}}
  *  {id: id, method: 'read value', payload: {id: number}}. response: {id: id, success: Bool}
-// TODO: subscribe to indication events
+
+// TODO: indications as a subscription?

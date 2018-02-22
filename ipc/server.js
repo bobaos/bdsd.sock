@@ -33,20 +33,26 @@ let server;
 const createServer = socketFile => {
   return net.createServer(stream => {
       console.log('Listening on:', socketFile);
-      let timestamp = Date.now();
-      let connection = {stream: stream, timestamp: timestamp};
+      let connectionId = Math.round(Math.random()*Date.now());
+      let connection = {stream: stream, id: connectionId};
       connections.push(connection);
       const frameParser = new FrameParser();
       stream.pipe(frameParser);
       frameParser.on('data', data => {
-        console.log('got data from client', connection.timestamp, data.toString());
+        console.log('got data from client', connection.id, data.toString());
         // TODO: process parsed data to api.js
+        // TODO: var #1:
+        // TODO: 1) EE emits event 'request'
+        // TODO: 2) api.js already subscribed to this event with callback([stream, data] as params) that do following:
+        // TODO:    *** parse request. if wrong, then send error to this socket.
+        // TODO:    *** if request is good then send data to bobaos, process response and send data to socket.
+
       });
       stream.on('end', _ => {
-        console.log('disconnect', connection.timestamp);
+        console.log('disconnect', connection.id);
         // delete connection from connections array
-        const findConnByTimestamp = t => t.timestamp === connection.timestamp;
-        let connectionIndex = connections.findIndex(findConnByTimestamp);
+        const findConnById = t => t.id === connection.id;
+        let connectionIndex = connections.findIndex(findConnById);
         if (connectionIndex > 0) {
           connections.splice(connectionIndex, 1);
         }
