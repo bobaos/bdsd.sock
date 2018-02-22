@@ -5,10 +5,10 @@ All communication should be enveloped in following frame format:
 ```
 |B|D|S|M|<LB>|<LE>|<DATA>|<C>|
 ```
-Where <L> is two byte field in BE that contains length of <DATA>, <C> is checksum of <DATA> (sum of all bytes modulo 256). BDSM(Bobaos Datapoint Sdk Message) is a string header of message.
+Where \<L\> is two byte field in BE that contains length of \<DATA\>, \<C\> is checksum of \<DATA\> (sum of all bytes modulo 256). BDSM(Bobaos Datapoint Sdk Message) is a string header of message.
 
 3. Data protocol description
-Field <DATA> is stringified JSON object which shoud match next format in case of Client => Host communication:
+Field \<DATA\> is stringified JSON object which shoud match next format in case of Client => Host communication:
 
 ```
 {
