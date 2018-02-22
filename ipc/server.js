@@ -29,7 +29,6 @@ const createServer = socketFile => {
         }
       };
 
-      console.log('Listening on:', socketFile);
       let connectionId = Math.round(Math.random() * Date.now());
       let connection = {stream: stream, id: connectionId, writeCb: writeCb};
       connections.push(connection);
@@ -41,7 +40,6 @@ const createServer = socketFile => {
       ipc.emit('connected', connectionId, writeCb);
 
       frameParser.on('data', data => {
-        console.log('got data from client', connection.id, data.toString());
         // DONE: process parsed data to api.js
         // DONE: var #1:
         // DONE: 1) EE ipc emits event 'request'
@@ -69,10 +67,7 @@ const createServer = socketFile => {
         forgetConnection();
       });
     })
-    .listen(socketFile)
-    .on('connection', socket => {
-      console.log('connected');
-    });
+    .listen(socketFile);
 };
 
 console.log('Checking for leftover socket.');
@@ -80,6 +75,7 @@ fs.stat(SOCKETFILE, function (err, stats) {
   if (err) {
     // start server
     console.log('No leftover socket found.');
+    console.log('Listening at ', SOCKETFILE);
     server = createServer(SOCKETFILE);
     return;
   }
@@ -91,6 +87,7 @@ fs.stat(SOCKETFILE, function (err, stats) {
       console.error(err);
       process.exit(0);
     }
+    console.log('Listening at ', SOCKETFILE);
     server = createServer(SOCKETFILE);
   });
 });
