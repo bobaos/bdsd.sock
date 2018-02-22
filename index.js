@@ -7,10 +7,17 @@ let baosConnected = false;
 
 // interprocess communication events
 ipc.on('connected', (id, writeCb) => {
-  console.log('index.js connected from ipc: ', id);
-  writeCb('connection response');
+  console.log('ipc connected: ', id);
   if (baosConnected) {
-    writeCb('baos connected')
+    writeCb(JSON.stringify({
+      method: 'notify',
+      payload: 'baos connected'
+    }))
+  } else {
+    writeCb(JSON.stringify({
+      method: 'notify',
+      payload: 'baos disconnected'
+    }))
   }
 });
 
@@ -41,6 +48,9 @@ const processRequest = (dataStr) => {
           .then(data => {
             response.payload = data;
             resolve(response);
+          })
+          .catch(e => {
+            reject(e);
           });
         break;
       case 'get description':
@@ -54,6 +64,9 @@ const processRequest = (dataStr) => {
               .then(data => {
                 response.payload = data;
                 resolve(response);
+              })
+              .catch(e => {
+                reject(e);
               });
           })
           .catch(e => {
@@ -61,11 +74,59 @@ const processRequest = (dataStr) => {
           });
         break;
       case 'get value':
+        requireField(request, 'payload');
+        requireField(request.payload, 'id');
+        sdk
+          .findDatapoint(request.payload.id)
+          .then(datapoint => {
+            datapoint
+              .getValue()
+              .then(data => {
+                response.payload = data;
+                resolve(response);
+              })
+              .catch(e => {
+                reject(e);
+              });
+          });
         break;
       case 'read value':
+        requireField(request, 'payload');
+        requireField(request.payload, 'id');
+        sdk
+          .findDatapoint(request.payload.id)
+          .then(datapoint => {
+            datapoint
+              .readValue()
+              .then(data => {
+                response.payload = data;
+                resolve(response);
+              })
+              .catch(e => {
+                reject(e);
+              });
+          });
         break;
       case 'set value':
+        requireField(request, 'payload');
+        requireField(request.payload, 'id');
+        requireField(request.payload, 'value');
+        sdk
+          .findDatapoint(request.payload.id)
+          .then(datapoint => {
+            datapoint
+              .setValue(request.payload.value)
+              .then(data => {
+                response.payload = data;
+                resolve(response);
+              })
+              .catch(e => {
+                reject(e);
+              });
+          });
         break;
+      default:
+        reject(new Error(`Unknown method ${method}`));
     }
   });
 };
@@ -90,5 +151,9 @@ ipc.on('request', (data, writeCb) => {
 sdk.on('connected', _ => {
   baosConnected = true;
   // TODO: ipc broadcast
+  ipc.broadcast(JSON.stringify({
+    method: 'broadcast',
+    payload: 'connected'
+  }));
 });
 
