@@ -168,7 +168,7 @@ sdk.on('connected', _ => {
 // on indication
 sdk.on('DatapointValue.Ind', payload => {
   let message = {};
-  message.method = 'notify';
+  message.method = 'ind value';
   message.payload = payload;
   ipc.broadcast(JSON.stringify(message));
 });
