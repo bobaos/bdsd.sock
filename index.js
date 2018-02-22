@@ -27,13 +27,25 @@ ipc.on('request', (data, writeCb) => {
     let request = JSON.parse(dataStr);
     console.log(request);
     if (!Object.prototype.hasOwnProperty.call(request, 'request_id')) {
-      throw new Error('Bad request. No "request_id" field.');
+      throw new Error('Bad request. No <request_id> field.');
     }
     response.response_id = request.request_id;
     if (!Object.prototype.hasOwnProperty.call(request, 'method')) {
-      throw new Error('Bad request. NO "method" field.');
+      throw new Error('Bad request. No <method> field.');
     }
     response.method = request.method;
+    switch (request.method) {
+      case 'get datapoints':
+        break;
+      case 'get description':
+        break;
+      case 'get value':
+        break;
+      case 'read value':
+        break;
+      case 'set value':
+        break;
+    }
 
   } catch (e) {
     response.success = false;
