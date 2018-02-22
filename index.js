@@ -1,8 +1,3 @@
-// TODO: require server.js
-// TODO: import ipc object
-// TODO: register cb for 'connected' event with
-// TODO: register cb for 'request' event. send data on response
-
 // IPC
 const ipc = require('./ipc/server');
 // datapoint sdk
@@ -19,25 +14,51 @@ ipc.on('connected', (id, writeCb) => {
   }
 });
 
-ipc.on('request', (data, writeCb) => {
-  let dataStr = data.toString();
-  // TODO: process message by BDSM PROTOCOL
-  let response = {};
-  try {
+const processRequest = (dataStr) => {
+  return new Promise((resolve, reject) => {
+    let response = {};
+    // check if connected first
+    if (!baosConnected) {
+      reject(new Error('No baos module connected.'));
+    }
+    // then proceed to request
     let request = JSON.parse(dataStr);
     console.log(request);
-    if (!Object.prototype.hasOwnProperty.call(request, 'request_id')) {
-      throw new Error('Bad request. No <request_id> field.');
-    }
+
+    const requireField = (object, field) => {
+      if (!Object.prototype.hasOwnProperty.call(object, field)) {
+        reject(new Error(`Bad request. No <${field}> field`));
+      }
+    };
+    requireField(request, 'request_id');
     response.response_id = request.request_id;
-    if (!Object.prototype.hasOwnProperty.call(request, 'method')) {
-      throw new Error('Bad request. No <method> field.');
-    }
+    requireField(request, 'method');
     response.method = request.method;
     switch (request.method) {
       case 'get datapoints':
+        sdk
+          .getAllDatapointDescriptions()
+          .then(data => {
+            response.payload = data;
+            resolve(response);
+          });
         break;
       case 'get description':
+        requireField(request, 'payload');
+        requireField(request.payload, 'id');
+        sdk
+          .findDatapoint(request.payload.id)
+          .then(datapoint => {
+            datapoint
+              .getDescription()
+              .then(data => {
+                response.payload = data;
+                resolve(response);
+              });
+          })
+          .catch(e => {
+            reject(e);
+          });
         break;
       case 'get value':
         break;
@@ -46,14 +67,23 @@ ipc.on('request', (data, writeCb) => {
       case 'set value':
         break;
     }
+  });
+};
 
-  } catch (e) {
-    response.success = false;
-    response.error = e.message;
-    //writeCb(JSON.stringify({sucess: false, payload: {id: dataStr, message: 'Wrong JSON'}}))
-  } finally {
-    writeCb(JSON.stringify(response));
-  }
+ipc.on('request', (data, writeCb) => {
+  let dataStr = data.toString();
+  // TODO: process message by BDSM PROTOCOL
+  processRequest(dataStr)
+    .then(response => {
+      response.success = true;
+      writeCb(JSON.stringify(response));
+    })
+    .catch(e => {
+      let response = {};
+      response.success = false;
+      response.error = e.message;
+      writeCb(JSON.stringify(response));
+    });
 });
 
 // bobaos datapoint sdk events
