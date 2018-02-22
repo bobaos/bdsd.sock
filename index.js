@@ -14,13 +14,24 @@ let baosConnected = false;
 ipc.on('connected', (id, writeCb) => {
   console.log('index.js connected from ipc: ', id);
   writeCb('connection response');
+  if (baosConnected) {
+    writeCb('baos connected')
+  }
 });
 
 ipc.on('request', (data, writeCb) => {
-
+  let dataStr = data.toString();
+  // TODO: process message by BDSM PROTOCOL
+  try {
+    let req = JSON.parse(dataStr);
+    console.log(req);
+  } catch (e) {
+    writeCb(JSON.stringify({sucess: false, payload: {id: dataStr, message: 'Wrong JSON'}}))
+  }
 });
 
 // bobaos datapoint sdk events
 sdk.on('connected', _ => {
-
+  baosConnected = true;
 });
+

@@ -22,7 +22,11 @@ const createServer = socketFile => {
   return net.createServer(stream => {
       // callback function to send data
       const writeCb = (data) => {
-        stream.write(composeFrame(data));
+        try {
+          stream.write(composeFrame(data));
+        } catch (e) {
+          console.log('error in writeCb:', e);
+        }
       };
 
       console.log('Listening on:', socketFile);
@@ -32,17 +36,19 @@ const createServer = socketFile => {
       const frameParser = new FrameParser();
       stream.pipe(frameParser);
 
+      // error handling
+      stream.on('error', console.log);
       // emit event ipc
       ipc.emit('connected', connectionId, writeCb);
 
       frameParser.on('data', data => {
         console.log('got data from client', connection.id, data.toString());
-        // TODO: process parsed data to api.js
-        // TODO: var #1:
-        // TODO: 1) EE emits event 'request'
-        // TODO: 2) api.js already subscribed to this event with callback([stream, data] as params) that do following:
-        // TODO:    *** parse request. if wrong, then send error to this socket.
-        // TODO:    *** if request is good then send data to bobaos, process response and send data to socket.
+        // DONE: process parsed data to api.js
+        // DONE: var #1:
+        // DONE: 1) EE ipc emits event 'request'
+        // DONE: 2) index.js already subscribed to this event with callback([data, writeCb]) that do following:
+        // DONE:    *** parse request. if wrong, then send error to this socket.
+        // DONE:    *** if request is good then send data to bobaos, process response and send data to socket.
         ipc.emit('request', data, writeCb);
       });
       stream.on('end', _ => {
