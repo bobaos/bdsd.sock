@@ -114,7 +114,8 @@ process.on('SIGINT', cleanup);
 // broadcast
 ipc.broadcast = data => {
   connections.forEach(t => {
-    t.stream.write(JSON.stringify({method: 'test'}));
+    console.log('broadcasting data', data);
+    t.writeCb(data);
   });
 };
 

@@ -235,7 +235,7 @@ const Sdk = (params) => {
       self.findDatapoint(id)
         .then(datapoint => {
           return datapoint
-            ._applyValue(encodedValue)
+            ._applyValue(encodedValue);
         })
         .then(value => {
           self.emit('DatapointValue.Ind', {id: id, value: value});

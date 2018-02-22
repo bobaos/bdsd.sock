@@ -30,7 +30,6 @@ const processRequest = (dataStr) => {
     }
     // then proceed to request
     let request = JSON.parse(dataStr);
-    console.log(request);
 
     const requireField = (object, field) => {
       if (!Object.prototype.hasOwnProperty.call(object, field)) {
@@ -141,6 +140,7 @@ const processRequest = (dataStr) => {
 
 ipc.on('request', (data, writeCb) => {
   let dataStr = data.toString();
+  console.log('got request', dataStr);
   // TODO: process message by BDSM PROTOCOL
   processRequest(dataStr)
     .then(response => {
