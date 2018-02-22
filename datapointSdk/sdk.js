@@ -136,13 +136,6 @@ const Sdk = (params) => {
       }
     });
   };
-  self.getAllDatapoints = function () {
-    return self.store.datapoints.slice();
-  };
-  self.getAllDatapointDescriptions = function () {
-    return self.store.descriptions.slice();
-  };
-
 
   // 1. set server item for indication to false at beginning
   // 2. get description for all datapoints [1-1000].
