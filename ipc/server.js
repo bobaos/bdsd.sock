@@ -1,43 +1,40 @@
 const net = require('net');
 const fs = require('fs');
-//const request = require('request');
+const EE = require('events').EventEmitter;
 
 const FrameParser = require('./FrameHelpers/Parser');
 const {composeFrame} = require('./FrameHelpers/compose');
 
-//const CONFIGFILE = process.env['HOME'] + '/.config/bobaos.json';
-console.log(process.env);
 
-
-// TODO: if config file is described in args, then load it, else - default
-// TODO: args for daemon
-// TODO: bobaos datapoint sdk daemon (bdsd)
-
-// TODO: Bobaos Datapoint Sdk Message
+// DONE: Bobaos Datapoint Sdk Message
 // |B|D|S|M|<L>|<DATA>|<CR>
 // <L> = <DATA>.length (~)
 // <CR> = sum(<DATA>) % 256
-
-
-// bdsd config.json
-//const config = require(CONFIGFILE);
-
 // Bobaos Datapoint Sdk unix domain socket
-// bdsm.sock
 const SOCKETFILE = process.env['XDG_RUNTIME_DIR'] + '/bdsd.sock';
 let SHUTDOWN = false;
 
 let connections = [];
+let ipc = new EE();
 let server;
 
 const createServer = socketFile => {
   return net.createServer(stream => {
+      // callback function to send data
+      const writeCb = (data) => {
+        stream.write(composeFrame(data));
+      };
+
       console.log('Listening on:', socketFile);
-      let connectionId = Math.round(Math.random()*Date.now());
-      let connection = {stream: stream, id: connectionId};
+      let connectionId = Math.round(Math.random() * Date.now());
+      let connection = {stream: stream, id: connectionId, writeCb: writeCb};
       connections.push(connection);
       const frameParser = new FrameParser();
       stream.pipe(frameParser);
+
+      // emit event ipc
+      ipc.emit('connected', connectionId, writeCb);
+
       frameParser.on('data', data => {
         console.log('got data from client', connection.id, data.toString());
         // TODO: process parsed data to api.js
@@ -46,14 +43,14 @@ const createServer = socketFile => {
         // TODO: 2) api.js already subscribed to this event with callback([stream, data] as params) that do following:
         // TODO:    *** parse request. if wrong, then send error to this socket.
         // TODO:    *** if request is good then send data to bobaos, process response and send data to socket.
-
+        ipc.emit('request', data, writeCb);
       });
       stream.on('end', _ => {
         console.log('disconnect', connection.id);
         // delete connection from connections array
         const findConnById = t => t.id === connection.id;
         let connectionIndex = connections.findIndex(findConnById);
-        if (connectionIndex > 0) {
+        if (connectionIndex >= 0) {
           connections.splice(connectionIndex, 1);
         }
       });
@@ -92,7 +89,7 @@ function cleanup() {
     connections
       .forEach(t => {
         console.log('Disconnecting', t.timestamp);
-        t.stream.write(JSON.stringify({method: 'disconnect'}));
+        t.stream.write(composeFrame(JSON.stringify({id: 1, method: 'disconnect'})));
         t.stream.end();
       });
     server.close();
@@ -102,9 +99,12 @@ function cleanup() {
 
 process.on('SIGINT', cleanup);
 
-// test
-// setInterval( _ => {
-//   connections.forEach(t => {
-//     t.stream.write(JSON.stringify({method: 'test'}));
-//   })
-// }, 5000);
+
+// broadcast
+ipc.broadcast = data => {
+  connections.forEach(t => {
+    t.stream.write(JSON.stringify({method: 'test'}));
+  });
+};
+
+module.exports = ipc;

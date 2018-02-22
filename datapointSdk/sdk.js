@@ -43,6 +43,16 @@ const Sdk = (params) => {
     this.length = props.length;
     this.value = null;
   };
+  Datapoint.prototype.getDescription = function() {
+    return new Promise((resolve, reject) => {
+      resolve({
+        id: this.id,
+        dpt: this.dpt,
+        flags: this.flags,
+        length: this.length
+      });
+    });
+  };
   Datapoint.prototype.setValue = function (value) {
     return new Promise((resolve, reject) => {
       let id = this.id;

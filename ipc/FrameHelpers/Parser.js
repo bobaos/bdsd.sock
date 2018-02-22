@@ -44,7 +44,6 @@ class FrameParser extends Transform {
           }
         } else {
           // console.log('transform: move on');
-          console.log(data);
           data = data.slice(1);
         }
        } else {
@@ -58,7 +57,6 @@ class FrameParser extends Transform {
 
   _flush(cb)
   {
-    this.push(this.buffer);
     this.buffer = Buffer.alloc(0);
     cb();
   }
