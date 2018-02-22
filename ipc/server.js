@@ -37,7 +37,6 @@ const createServer = socketFile => {
       stream.pipe(frameParser);
 
       // error handling
-      stream.on('error', console.log);
       // emit event ipc
       ipc.emit('connected', connectionId, writeCb);
 
@@ -51,14 +50,23 @@ const createServer = socketFile => {
         // DONE:    *** if request is good then send data to bobaos, process response and send data to socket.
         ipc.emit('request', data, writeCb);
       });
-      stream.on('end', _ => {
-        console.log('disconnect', connection.id);
-        // delete connection from connections array
+
+      // delete connection from connections array
+      const forgetConnection = _ => {
         const findConnById = t => t.id === connection.id;
         let connectionIndex = connections.findIndex(findConnById);
         if (connectionIndex >= 0) {
           connections.splice(connectionIndex, 1);
         }
+      };
+      stream.on('error', e => {
+        console.log('error with socket ', connectionId, e);
+        console.log('disconnecting', connectionId);
+        forgetConnection();
+      });
+      stream.on('end', _ => {
+        console.log('disconnect', connection.id);
+        forgetConnection();
       });
     })
     .listen(socketFile)
