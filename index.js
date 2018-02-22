@@ -141,7 +141,6 @@ const processRequest = (dataStr) => {
 ipc.on('request', (data, writeCb) => {
   let dataStr = data.toString();
   console.log('got request', dataStr);
-  // TODO: process message by BDSM PROTOCOL
   processRequest(dataStr)
     .then(response => {
       response.success = true;
@@ -158,7 +157,6 @@ ipc.on('request', (data, writeCb) => {
 // bobaos datapoint sdk events
 sdk.on('connected', _ => {
   baosConnected = true;
-  // TODO: ipc broadcast
   ipc.broadcast(JSON.stringify({
     method: 'broadcast',
     payload: 'connected'
@@ -172,3 +170,4 @@ sdk.on('DatapointValue.Ind', payload => {
   message.payload = payload;
   ipc.broadcast(JSON.stringify(message));
 });
+
