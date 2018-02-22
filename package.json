@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/shabunin/bdsd.sock/issues"
   },
-  "homepage": "https://github.com/shabunin/bdsd.sock#readme"
+  "homepage": "https://github.com/shabunin/bdsd.sock#readme",
+  "dependencies": {
+    "bobaos": "^2.0.1",
+    "knx-dpts-baos": "^1.0.0"
+  }
 }

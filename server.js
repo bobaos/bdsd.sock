@@ -31,21 +31,25 @@ let connections = [];
 let server;
 
 const createServer = socketFile => {
-  console.log('Creating server', socketFile);
   return net.createServer(stream => {
-      console.log('conn ack');
+      console.log('Listening on:', socketFile);
       let timestamp = Date.now();
       let connection = {stream: stream, timestamp: timestamp};
-      let connectionIndex = connections.length;
       connections.push(connection);
       const frameParser = new FrameParser();
       stream.pipe(frameParser);
       frameParser.on('data', data => {
         console.log('got data from client', connection.timestamp, data.toString());
+        // TODO: process parsed data to api.js
       });
       stream.on('end', _ => {
         console.log('disconnect', connection.timestamp);
-        connections.splice(connectionIndex, 1);
+        // delete connection from connections array
+        const findConnByTimestamp = t => t.timestamp === connection.timestamp;
+        let connectionIndex = connections.findIndex(findConnByTimestamp);
+        if (connectionIndex > 0) {
+          connections.splice(connectionIndex, 1);
+        }
       });
     })
     .listen(socketFile)

@@ -5,7 +5,6 @@ const {composeFrame} = require('./FrameHelpers/compose');
 
 ////////////////
 
-
 ////////////////
 
 var client = net.createConnection(SOCKETFILE);
