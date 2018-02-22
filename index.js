@@ -62,7 +62,10 @@ const processRequest = (dataStr) => {
             datapoint
               .getDescription()
               .then(data => {
-                response.payload = data;
+                response.payload = {
+                  id: request.payload.id,
+                  value: data
+                };
                 resolve(response);
               })
               .catch(e => {
@@ -82,7 +85,10 @@ const processRequest = (dataStr) => {
             datapoint
               .getValue()
               .then(data => {
-                response.payload = data;
+                response.payload = {
+                  id: request.payload.id,
+                  value: data
+                };
                 resolve(response);
               })
               .catch(e => {
@@ -97,9 +103,9 @@ const processRequest = (dataStr) => {
           .findDatapoint(request.payload.id)
           .then(datapoint => {
             datapoint
-              .readValue()
+              .readFromBus()
               .then(data => {
-                response.payload = data;
+                response.payload = {id: request.payload.id};
                 resolve(response);
               })
               .catch(e => {
@@ -117,7 +123,9 @@ const processRequest = (dataStr) => {
             datapoint
               .setValue(request.payload.value)
               .then(data => {
-                response.payload = data;
+                response.payload = {
+                  id: request.payload.id
+                };
                 resolve(response);
               })
               .catch(e => {
@@ -157,3 +165,10 @@ sdk.on('connected', _ => {
   }));
 });
 
+// on indication
+sdk.on('DatapointValue.Ind', payload => {
+  let message = {};
+  message.method = 'notify';
+  message.payload = payload;
+  ipc.broadcast(JSON.stringify(message));
+});
