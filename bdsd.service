@@ -1,0 +1,11 @@
+[Unit]
+Description=Bobaos Datapoint Sdk Daemon
+
+[Service]
+ExecStart=/usr/local/bin/node /opt/bdsd.sock/index.js
+WorkingDirectory=/opt/bdsd.sock
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
