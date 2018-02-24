@@ -158,15 +158,15 @@ ipc.on('request', (data, writeCb) => {
 sdk.on('connected', _ => {
   baosConnected = true;
   ipc.broadcast(JSON.stringify({
-    method: 'broadcast',
-    payload: 'connected'
+    method: 'notify',
+    payload: 'baos connected'
   }));
 });
 
 // on indication
 sdk.on('DatapointValue.Ind', payload => {
   let message = {};
-  message.method = 'ind value';
+  message.method = 'cast value';
   message.payload = payload;
   ipc.broadcast(JSON.stringify(message));
 });
