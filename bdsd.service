@@ -2,7 +2,7 @@
 Description=Bobaos Datapoint Sdk Daemon
 
 [Service]
-ExecStart=/usr/local/bin/node /opt/bdsd.sock/index.js
+ExecStart=/bin/bash /opt/bdsd.sock/start.sh
 WorkingDirectory=/opt/bdsd.sock
 Restart=always
 User=pi
