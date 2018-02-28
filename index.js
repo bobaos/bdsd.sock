@@ -179,7 +179,7 @@ sdk.on('connected', _ => {
   busConnected = true;
   ipc.broadcast(JSON.stringify({
     method: 'notify',
-    payload: 'bua connected'
+    payload: 'bus connected'
   }));
 });
 
