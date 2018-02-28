@@ -15,8 +15,10 @@ Assuming you have Raspberry Pi with installed Raspbian with configured access to
 
 ```sh
 $ git clone https://github.com/shabunin/bdsd.sock
-$ sudo cp -R bdsd.sock /opt/
-$ sudo cp -R bdsd.sock/bdsd.service /etc/systemd/system/
+$ cd bdsd.sock/
+$ npm install
+$ sudo cp -R ../bdsd.sock /opt/
+$ sudo cp bdsd.sock/bdsd.service /etc/systemd/system/
 $ sudo systemctl daemon-reload
 $ sudo systemctl enable bdsd.sock
 $ sudo systemctl start bdsd.sock
