@@ -134,6 +134,7 @@ const processRequest = (dataStr) => {
         break;
       default:
         reject(new Error(`Unknown method ${method}`));
+        break;
     }
   });
 };
