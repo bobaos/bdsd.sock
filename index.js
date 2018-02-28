@@ -24,16 +24,20 @@ ipc.on('connected', (id, writeCb) => {
 const processRequest = (dataStr) => {
   return new Promise((resolve, reject) => {
     let response = {};
+    const rejectResponse = e => {
+      response.error = e.message;
+      reject(response);
+    };
     // check if connected first
     if (!baosConnected) {
-      reject(new Error('No baos module connected.'));
+      rejectResponse(new Error('No baos module connected.'));
     }
     // then proceed to request
     let request = JSON.parse(dataStr);
 
     const requireField = (object, field) => {
       if (!Object.prototype.hasOwnProperty.call(object, field)) {
-        reject(new Error(`Bad request. No <${field}> field`));
+        rejectResponse(new Error(`Bad request. No <${field}> field`));
       }
     };
     requireField(request, 'request_id');
@@ -49,7 +53,7 @@ const processRequest = (dataStr) => {
             resolve(response);
           })
           .catch(e => {
-            reject(e);
+            rejectResponse(e);
           });
         break;
       case 'get description':
@@ -68,11 +72,11 @@ const processRequest = (dataStr) => {
                 resolve(response);
               })
               .catch(e => {
-                reject(e);
+                rejectResponse(e);
               });
           })
           .catch(e => {
-            reject(e);
+            rejectResponse(e);
           });
         break;
       case 'get value':
@@ -91,11 +95,11 @@ const processRequest = (dataStr) => {
                 resolve(response);
               })
               .catch(e => {
-                reject(e);
+                rejectResponse(e);
               });
           })
           .catch(e => {
-            reject(e);
+            rejectResponse(e);
           });
         break;
       case 'read value':
@@ -111,11 +115,11 @@ const processRequest = (dataStr) => {
                 resolve(response);
               })
               .catch(e => {
-                reject(e);
+                rejectResponse(e);
               });
           })
           .catch(e => {
-            reject(e);
+            rejectResponse(e);
           });
         break;
       case 'set value':
@@ -134,15 +138,15 @@ const processRequest = (dataStr) => {
                 resolve(response);
               })
               .catch(e => {
-                reject(e);
+                rejectResponse(e);
               });
           })
           .catch(e => {
-            reject(e);
+            rejectResponse(e);
           });
         break;
       default:
-        reject(new Error(`Unknown method ${method}`));
+        rejectResponse(new Error(`Unknown method ${method}`));
         break;
     }
   });
@@ -158,8 +162,14 @@ ipc.on('request', (data, writeCb) => {
     })
     .catch(e => {
       let response = {};
+      if (Object.prototype.hasOwnProperty.call(e, 'response_id')) {
+        response.response_id = e.response_id;
+      }
+      if (Object.prototype.hasOwnProperty.call(e, 'method')) {
+        response.method = e.method;
+      }
       response.success = false;
-      response.error = e.message;
+      response.error = e.error;
       writeCb(JSON.stringify(response));
     });
 });
