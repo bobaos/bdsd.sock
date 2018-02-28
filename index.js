@@ -93,6 +93,9 @@ const processRequest = (dataStr) => {
               .catch(e => {
                 reject(e);
               });
+          })
+          .catch(e => {
+            reject(e);
           });
         break;
       case 'read value':
@@ -110,6 +113,9 @@ const processRequest = (dataStr) => {
               .catch(e => {
                 reject(e);
               });
+          })
+          .catch(e => {
+            reject(e);
           });
         break;
       case 'set value':
@@ -130,6 +136,9 @@ const processRequest = (dataStr) => {
               .catch(e => {
                 reject(e);
               });
+          })
+          .catch(e => {
+            reject(e);
           });
         break;
       default:
