@@ -25,3 +25,11 @@ $ sudo systemctl start bdsd.sock
 ```
 
 # Usage in js
+
+For js applications there will be available client-side library which you may install from npm.
+
+Further information you can find in repo: [bdsd.client](https://github.com/shabunin/bdsd.client)
+
+# Usage with other programming languages
+
+For other programming languages you may implement client-side library which should communicate with IPC following [Bobaos Datapoint Sdk Message Protocol](./PROTOCOL.md).
