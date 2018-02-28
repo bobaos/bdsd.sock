@@ -3,20 +3,20 @@ const ipc = require('./ipc/server');
 // datapoint sdk
 const sdk = require('./datapointSdk/sdk')();
 
-let baosConnected = false;
+let busConnected = false;
 
 // interprocess communication events
 ipc.on('connected', (id, writeCb) => {
   console.log('ipc connected: ', id);
-  if (baosConnected) {
+  if (busConnected) {
     writeCb(JSON.stringify({
       method: 'notify',
-      payload: 'baos connected'
+      payload: 'bus connected'
     }))
   } else {
     writeCb(JSON.stringify({
       method: 'notify',
-      payload: 'baos disconnected'
+      payload: 'bus disconnected'
     }))
   }
 });
@@ -29,7 +29,7 @@ const processRequest = (dataStr) => {
       reject(response);
     };
     // check if connected first
-    if (!baosConnected) {
+    if (!busConnected) {
       rejectResponse(new Error('No baos module connected.'));
     }
     // then proceed to request
@@ -176,10 +176,10 @@ ipc.on('request', (data, writeCb) => {
 
 // bobaos datapoint sdk events
 sdk.on('connected', _ => {
-  baosConnected = true;
+  busConnected = true;
   ipc.broadcast(JSON.stringify({
     method: 'notify',
-    payload: 'baos connected'
+    payload: 'bua connected'
   }));
 });
 
@@ -188,6 +188,22 @@ sdk.on('DatapointValue.Ind', payload => {
   let message = {};
   message.method = 'cast value';
   message.payload = payload;
+  ipc.broadcast(JSON.stringify(message));
+});
+
+sdk.on('bus connected', _ => {
+  busConnected = true;
+  let message = {};
+  message.method = 'notify';
+  message.payload = 'bus connected';
+  ipc.broadcast(JSON.stringify(message));
+});
+
+sdk.on('bus disconnected', _ => {
+  busConnected = false;
+  let message = {};
+  message.method = 'notify';
+  message.payload = 'bus disconnected';
   ipc.broadcast(JSON.stringify(message));
 });
 

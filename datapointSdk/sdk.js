@@ -251,6 +251,20 @@ const Sdk = (params) => {
       })
     }
   });
+  // handle bus indication events
+  bobaos.on('ServerItem.Ind', payload => {
+    if (Array.isArray(payload)) {
+      payload.forEach(t => {
+        if (t.id === 10) {
+          if (t.value.readUInt8(0) === 1) {
+            self.emit('bus connected');
+          } else {
+            self.emit('bus disconnected');
+          }
+        }
+      })
+    }
+  });
   return self;
 };
 

@@ -7,24 +7,99 @@ All communication should be enveloped in following frame format:
 ```
 Where \<L\> is two byte field in BE that contains length of \<DATA\>, \<C\> is checksum of \<DATA\> (sum of all bytes modulo 256). BDSM(Bobaos Datapoint Sdk Message) is a string header of message.
 
-3. Data protocol description
+# \<DATA\> field description
+
 Field \<DATA\> is stringified JSON object which shoud match next format in case of Client => Host communication:
 
 ```
 {
   request_id: Number,
   method: String,
-  payload: Object
+  payload: Object // optional
 }
+```
+## Fields explanation
 
+### request_id
+ 
+ field should be unique at the moment of sending and it is responsibility of client to process this value. Server sends responses with this value in response_id field back to client.
+
+### method field. 
+
+ * **get datapoints**
+ 
+ 
+Request: 
+
+```{"request_id":18052831966,"method":"get datapoints"}```
+
+Response: 
+
+```{"response_id":18052831966,"method":"get datapoints","payload":[{"id":1,"length":1,"flags":{"priority":"low","communication":true,"read":false,"write":true,"readOnInit":false,"transmit":true,"update":false},"dpt":"dpt1"},{"id":2,"length":1,"...}]}```
+
+ * **get description**
+ 
+Request: 
+
+```{"request_id":145663188249,"method":"get description","payload":{"id":31}}```
+
+Response: 
+
+```{"response_id":145663188249,"method":"get description","payload":{"id":31,"value":{"id":31,"dpt":"dpt5","flags":{"priority":"low","communication":true,"read":false,"write":true,"readOnInit":false,"transmit":true,"update":false},"length":1}},"success":true}```
+
+ * **get value**
+ 
+Request: 
+
+```{"request_id":65362052157,"method":"get value","payload":{"id":31}}```
+
+Response: 
+
+```{"response_id":65362052157,"method":"get value","payload":{"id":31,"value":74},"success":true}```
+
+ * **read value** 
+ 
+Request: 
+
+```{"request_id":611387384802,"method":"read value","payload":{"id":31}}```
+
+Response: 
+
+```{"response_id":611387384802,"method":"read value","payload":{"id":31},"success":true}```
+
+ * **set value**
+ 
+Request:
+ 
+ ```{"request_id":839768583900,"method":"set value","payload":{"id":31,"value":5}}```
+ 
+Response: 
+
+```{"response_id":839768583900,"method":"set value","payload":{"id":31},"success":true}```
+
+
+## Broadcasting value.
+
+When datapoint value changes on bus, socket broadcasts following data to all connected clients:
+```
+{"method":"cast value","payload":{"id":12,"value":22.92}}
 ```
 
-* **request_id** field should be unique at the moment of sending and it is responsibility of client to process this value. Server sends responses with this value in response_id field back to client.
+## Notify 
 
-* **method** field. 
- *  ```{request_id: id, method: 'get description', payload: {id: number (1-1000)}}```. Response: ```{response_id: number, payload: {id: number (1-1000), value: Object}}```
- *  ```{request_id: id, method: 'get value', payload: {id: number}```. Response: ```{response_id: id, success: Bool, payload: {id: number (1-1000), value: value}}```
- *  ```{request_id: id, method: 'read value', payload: {id: number}}```. Response: ```{response_id: id, success: Bool}```
- *  ```{request_id: id, method: 'set value', payload: {id: number (1-1000), value: value(depends)}}```. response: ```{id: id, success: Bool}```
+When Client connects to socket, initial notification sends from Host to Client indicating connectino status:
 
-// TODO: indications 
+```{"method":"notify","payload":"bus connected"}```
+
+## Error handling
+
+In case of error Host sends to Client data with "success" field set to false;
+
+
+Request: 
+
+```{"request_id":289551154644,"method":"set value","payload":{"id":31,"value":257}}```
+
+Response: 
+
+```{"response_id":289551154644,"method":"set value","success":false,"error":"Value out of range (expected 0-255, got 257)"}```
