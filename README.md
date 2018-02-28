@@ -18,7 +18,7 @@ $ git clone https://github.com/shabunin/bdsd.sock
 $ cd bdsd.sock/
 $ npm install
 $ sudo cp -R ../bdsd.sock /opt/
-$ sudo cp bdsd.sock/bdsd.service /etc/systemd/system/
+$ sudo cp ./bdsd.service /etc/systemd/system/
 $ sudo systemctl daemon-reload
 $ sudo systemctl enable bdsd.sock
 $ sudo systemctl start bdsd.sock
