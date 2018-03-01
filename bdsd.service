@@ -2,10 +2,8 @@
 Description=Bobaos Datapoint Sdk Daemon
 
 [Service]
-ExecStart=/bin/bash /opt/bdsd.sock/start.sh
-WorkingDirectory=/opt/bdsd.sock
-Restart=always
-User=pi
+ExecStart=/usr/bin/env node %h/bdsd.sock/index.js
+WorkingDirectory=%h/bdsd.sock
 
 [Install]
 WantedBy=multi-user.target
