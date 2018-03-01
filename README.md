@@ -13,35 +13,47 @@ So, schematically it may look like this:
 
 Assuming you have Raspberry Pi with installed Raspbian with configured access to BAOS module via /dev/ttyAMA0.
 
-### 1. Clone repository to home folder, install dependencies.
+**1. Clone repository to home folder, install dependencies.**
 
-```bash
+```
 $ cd ~/
 $ git clone https://github.com/shabunin/bdsd.sock
 $ cd ~/bdsd.sock/
 $ npm install
 ```
 
-### 2. Create systemd service folders, copy service file
+Check if it executes correctly:
 
-```bash
+```
+$ node index.js
+Checking for leftover socket.
+No leftover socket fount.
+Listening at /run/user/1000/bdsd.sock
+.....
+.....
+got bus state: connected
+```
+
+**2. Create systemd service folders, copy service file**
+
+```
 $ cd ~/
 $ mkdir ~/.config/systemd
 $ mkdir ~/.config/systemd/user
 $ cp ~/bdsd.sock/bdsd.service ~/.config/systemd/user/
 ```
 
-### 3. Enable service, enable automatic start-up
+**3. Enable service, enable automatic start-up**
 
-```bash
+```
 $ systemctl --user daemon-reload
 $ systemctl --user enable bdsd.service
 $ sudo loginctl enable-linger pi
 ```
 
-### 4. Start the service
+**4. Start the service**
 
-```bash
+```
 $ systemctl --user start bdsd.service
 ```
 
