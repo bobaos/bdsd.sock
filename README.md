@@ -28,21 +28,21 @@ $ npm install
 $ cd ~/
 $ mkdir ~/.config/systemd
 $ mkdir ~/.config/systemd/user
-$ cp ~/bdsd.sock/bdsd.service ~/.config/systemd/user
+$ cp ~/bdsd.sock/bdsd.service ~/.config/systemd/user/
 ```
 
 ## 3. Enable service, enable automatic start-up
 
 ```bash
 $ systemctl --user daemon-reload
-$ systemctl --user enable bdsd.sock
+$ systemctl --user enable bdsd.service
 $ sudo loginctl enable-linger pi
 ```
 
 ## 4. Start the service
 
 ```bash
-$ systemctl --user start bdsd.sock
+$ systemctl --user start bdsd.service
 ```
 
 # Usage in js
