@@ -6,4 +6,4 @@ ExecStart=/usr/bin/env node %h/bdsd.sock/index.js
 WorkingDirectory=%h/bdsd.sock
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
