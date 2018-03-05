@@ -13,6 +13,8 @@ So, schematically it may look like this:
 
 Assuming you have Raspberry Pi with installed Raspbian with configured access to BAOS module via /dev/ttyAMA0.
 
+If not, follow instructions on [bobaos repository page](https://github.com/shabunin/bobaos#installation)
+
 **1. Clone repository to home folder, install dependencies.**
 
 ```
