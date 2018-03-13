@@ -86,7 +86,7 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":839768583900,"method":"set value","payload":{"id":31},"success":true}```
 
-### programming mode
+#### programming mode
 
  Set programming mode. As if you press PROG button.
  
