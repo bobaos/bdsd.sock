@@ -59,7 +59,7 @@ $ sudo loginctl enable-linger pi
 $ systemctl --user start bdsd.service
 ```
 
- **5. Check with [bdsd-cli](https://github.com/shabunin/bdsd-cli)
+ **5. Check with [bdsd-cli](https://github.com/shabunin/bdsd-cli)**
 
 ```
 $ sudo npm -g install bdsd-cli
