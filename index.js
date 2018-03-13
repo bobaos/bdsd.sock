@@ -145,6 +145,18 @@ const processRequest = (dataStr) => {
             rejectResponse(e);
           });
         break;
+      case 'programming mode':
+        requireField(request, 'payload');
+        requireField(request.payload, 'value');
+        sdk
+          .setProgrammingMode(request.payload.value)
+          .then(data => {
+            resolve(response);
+          })
+          .catch(e => {
+            rejectResponse(e);
+          });
+        break;
       default:
         rejectResponse(new Error(`Unknown method ${method}`));
         break;

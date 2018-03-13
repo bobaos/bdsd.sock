@@ -147,6 +147,23 @@ const Sdk = (params) => {
     });
   };
 
+
+  // programming mode
+  self.setProgrammingMode = value => {
+    return new Promise((resolve, reject) => {
+      const valueBuff = Buffer.alloc(1, value & 0x01);
+      bobaos
+        .setServerItem(15, valueBuff)
+        .then(payload => {
+          resolve(payload);
+        })
+        .catch(e => {
+          reject(e);
+        })
+    });
+  };
+
+
   // 1. set server item for indication to false at beginning
   // 2. get description for all datapoints [1-1000].
   // 3. send GetServerItem request for "bus connected state" item.
@@ -160,7 +177,7 @@ const Sdk = (params) => {
         console.log('success on setting indications to:', value);
       })
       .catch(e => {
-        console.log('error while setting indications to:', value);
+        console.log('error while setting indications to:', value, e);
       })
   };
   const getAllDatapointDescription = _ => {

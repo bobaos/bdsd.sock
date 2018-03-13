@@ -86,6 +86,18 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":839768583900,"method":"set value","payload":{"id":31},"success":true}```
 
+### programming mode
+
+ Set programming mode. As if you press PROG button.
+ 
+ Request:
+ 
+ ```{"request_id":1366287859749,"method":"programming mode","payload":{"value":1}}```
+
+ Response: 
+ 
+ ```{"response_id":1366287859749,"method":"programming mode","success":true}```
+ 
 ## Broadcasting value.
 
 When datapoint value changes on bus, socket broadcasts following data to all connected clients:
