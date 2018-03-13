@@ -59,6 +59,18 @@ $ sudo loginctl enable-linger pi
 $ systemctl --user start bdsd.service
 ```
 
+ **5. Check with [bdsd-cli](https://github.com/shabunin/bdsd-cli)
+
+```
+$ sudo npm -g install bdsd-cli
+$ bdsd-cli
+connected
+bobaos> setProgrammingMode -v 1
+Set programming mode: success
+bobaos> getValue -s 1
+{ id: 1, value: true } 
+bobaos>
+```
 # Usage in js
 
 For js applications there will be available client-side library which you may install from npm.
