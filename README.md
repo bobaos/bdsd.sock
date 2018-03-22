@@ -15,19 +15,16 @@ Assuming you have Raspberry Pi with installed Raspbian with configured access to
 
 If not, follow instructions on [bobaos repository page](https://github.com/shabunin/bobaos#installation)
 
-**1. Clone repository to home folder, install dependencies.**
+**1. Install npm package**
 
 ```
-$ cd ~/
-$ git clone https://github.com/shabunin/bdsd.sock
-$ cd ~/bdsd.sock/
-$ npm install
+$ sudo npm install -g bdsd.sock --unsafe-perm
 ```
 
 Check if it executes correctly:
 
 ```
-$ node index.js
+$ bdsd.sock
 Checking for leftover socket.
 No leftover socket fount.
 Listening at /run/user/1000/bdsd.sock
@@ -36,13 +33,25 @@ Listening at /run/user/1000/bdsd.sock
 got bus state: connected
 ```
 
-**2. Create systemd service folders, copy service file**
+**2. Create systemd service folders, create service file**
 
 ```
 $ cd ~/
 $ mkdir ~/.config/systemd
 $ mkdir ~/.config/systemd/user
-$ cp ~/bdsd.sock/bdsd.service ~/.config/systemd/user/
+$ touch ~/.config/systemd/user/bdsd.service
+```
+
+Then add following to this file using your favourite text editor:
+```
+[Unit]
+Description=Bobaos Datapoint Sdk Daemon
+
+[Service]
+ExecStart=/usr/bin/env bdsd.sock
+
+[Install]
+WantedBy=default.target
 ```
 
 **3. Enable service, enable automatic start-up**
