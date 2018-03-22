@@ -2,8 +2,7 @@
 Description=Bobaos Datapoint Sdk Daemon
 
 [Service]
-ExecStart=/usr/bin/env node %h/bdsd.sock/index.js
-WorkingDirectory=%h/bdsd.sock
+ExecStart=/usr/bin/env bdsd.sock
 
 [Install]
 WantedBy=default.target
