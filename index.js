@@ -21,7 +21,7 @@ ipc.on('connected', (id, writeCb) => {
   }
 });
 
-const processRequest = (dataStr) => {
+const processRequest = (connectionId, dataStr) => {
   return new Promise((resolve, reject) => {
     let response = {};
     const rejectResponse = e => {
@@ -132,6 +132,12 @@ const processRequest = (dataStr) => {
             datapoint
               .setValue(request.payload.value)
               .then(data => {
+                // broadcast value except sender
+                let msg = {};
+                msg.method = 'cast value';
+                msg.payload = {id: request.payload.id, value: request.payload.value};
+                ipc.broadcast(JSON.stringify(msg), connectionId);
+                // resolve promise
                 response.payload = {
                   id: request.payload.id
                 };
@@ -164,10 +170,10 @@ const processRequest = (dataStr) => {
   });
 };
 
-ipc.on('request', (data, writeCb) => {
+ipc.on('request', (data, connectionId, writeCb) => {
   let dataStr = data.toString();
   console.log('got request', dataStr);
-  processRequest(dataStr)
+  processRequest(connectionId, dataStr)
     .then(response => {
       response.success = true;
       writeCb(JSON.stringify(response));

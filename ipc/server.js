@@ -46,7 +46,7 @@ const createServer = socketFile => {
         // DONE: 2) index.js already subscribed to this event with callback([data, writeCb]) that do following:
         // DONE:    *** parse request. if wrong, then send error to this socket.
         // DONE:    *** if request is good then send data to bobaos, process response and send data to socket.
-        ipc.emit('request', data, writeCb);
+        ipc.emit('request', data, connectionId, writeCb);
       });
 
       // delete connection from connections array
@@ -112,8 +112,16 @@ process.on('SIGINT', cleanup);
 
 
 // broadcast
-ipc.broadcast = data => {
-  connections.forEach(t => {
+ipc.broadcast = (data, except) => {
+  let to = [];
+  if (typeof !except === "undefined") {
+    to = connections.filter(t => {
+      return t.id === except;
+    });
+  } else {
+    to = connections.slice();
+  }
+  to.forEach(t => {
     console.log('broadcasting data', data);
     t.writeCb(data);
   });
