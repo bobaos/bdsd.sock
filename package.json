@@ -1,6 +1,6 @@
 {
   "name": "bdsd.sock",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bobaos Datapoint Sdk Unix Domain Socket",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "start": "node server.js"
   },
   "bin": {
-	  "bdsd.sock": "./bin/bdsd.sock.js"
+    "bdsd.sock": "./bin/bdsd.sock.js"
   },
   "repository": {
     "type": "git",
