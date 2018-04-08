@@ -1,3 +1,15 @@
+commit 35524bec5c08ba0881739b610c90f61cf358de26
+Author: Vladimir Shabunin <va.shabunin@physics.msu.ru>
+Date:   Sun Apr 8 18:06:39 2018 +0000
+
+    Install script
+
+commit 71d5d668ceb914b3a6627728ec636f8da00bab88
+Author: Vladimir Shabunin <va.shabunin@physics.msu.ru>
+Date:   Sun Apr 8 21:02:26 2018 +0300
+
+    CHANGELOG
+
 commit eeddb1ca5a321d1fcac0f26df72b6ce377970ef1
 Author: Vladimir Shabunin <va.shabunin@physics.msu.ru>
 Date:   Sun Apr 8 18:02:19 2018 +0000
