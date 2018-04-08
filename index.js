@@ -90,7 +90,8 @@ const processRequest = (connectionId, dataStr) => {
               .then(data => {
                 response.payload = {
                   id: request.payload.id,
-                  value: data
+                  value: data.value,
+                  raw: data.raw
                 };
                 resolve(response);
               })
@@ -136,10 +137,10 @@ const processRequest = (connectionId, dataStr) => {
                 // broadcast value except sender
                 datapoint
                   .getValue()
-                  .then(value => {
+                  .then(data => {
                     let msg = {};
                     msg.method = 'cast value';
-                    msg.payload = { id: id, value: value};
+                    msg.payload = { id: id, value: data.value, raw: data.raw};
                     ipc.broadcast(JSON.stringify(msg), connectionId);
                   })
                   .catch(err => {

@@ -79,8 +79,8 @@ const Sdk = (params) => {
             return datapoint
               ._applyValue(encodedValue);
           })
-          .then(value => {
-            resolve(value);
+          .then(payload => {
+            resolve(payload);
           })
           .catch(e => {
             reject(e)
@@ -116,7 +116,7 @@ const Sdk = (params) => {
       let dpt = this.dpt;
       try {
         this.value = DPTs[dpt].toJS(value);
-        resolve(this.value);
+        resolve({value: this.value, raw: value});
       } catch (e) {
         reject(e);
       }
@@ -254,8 +254,8 @@ const Sdk = (params) => {
           return datapoint
             ._applyValue(encodedValue);
         })
-        .then(value => {
-          self.emit('DatapointValue.Ind', {id: id, value: value});
+        .then(payload => {
+          self.emit('DatapointValue.Ind', {id: id, value: payload.value, raw: payload.raw});
         })
         .catch(e => {
           // should never be executed but anyway
