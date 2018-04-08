@@ -126,20 +126,28 @@ const processRequest = (connectionId, dataStr) => {
         requireField(request, 'payload');
         requireField(request.payload, 'id');
         requireField(request.payload, 'value');
+        let id = request.payload.id;
         sdk
-          .findDatapoint(request.payload.id)
+          .findDatapoint(id)
           .then(datapoint => {
             datapoint
               .setValue(request.payload.value)
               .then(data => {
                 // broadcast value except sender
-                let msg = {};
-                msg.method = 'cast value';
-                msg.payload = {id: request.payload.id, value: request.payload.value};
-                ipc.broadcast(JSON.stringify(msg), connectionId);
+                datapoint
+                  .getValue()
+                  .then(value => {
+                    let msg = {};
+                    msg.method = 'cast value';
+                    msg.payload = { id: id, value: value};
+                    ipc.broadcast(JSON.stringify(msg), connectionId);
+                  })
+                  .catch(err => {
+                    console.log(err);
+                  });
                 // resolve promise
                 response.payload = {
-                  id: request.payload.id
+                  id: id
                 };
                 resolve(response);
               })
