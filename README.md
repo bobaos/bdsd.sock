@@ -15,6 +15,15 @@ Assuming you have Raspberry Pi with installed Raspbian with configured access to
 
 If not, follow instructions on [bobaos repository page](https://github.com/shabunin/bobaos#installation)
 
+## Installation via script
+
+```
+$ curl -L https://raw.githubusercontent.com/bobaos/bdsd.sock/master/bdsd_install.sh | bash
+```
+
+
+## Manual installation
+
 **1. Install npm package**
 
 ```
