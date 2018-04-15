@@ -114,9 +114,9 @@ process.on('SIGINT', cleanup);
 // broadcast
 ipc.broadcast = (data, except) => {
   let to = [];
-  if (typeof !except === "undefined") {
+  if (typeof except !== "undefined") {
     to = connections.filter(t => {
-      return t.id === except;
+      return t.id !== except;
     });
   } else {
     to = connections.slice();
