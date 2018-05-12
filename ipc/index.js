@@ -30,7 +30,7 @@ let BdsdIPC = socketFileParam => {
           try {
             stream.write(composeFrame(data));
           } catch (e) {
-            console.log('error in writeCb:', e);
+            console.log('IPC: error in writeCb:', e);
           }
         };
 
@@ -63,19 +63,19 @@ let BdsdIPC = socketFileParam => {
           }
         };
         stream.on('error', e => {
-          console.log('error with socket ', connectionId, e);
-          console.log('disconnecting', connectionId);
+          console.log('IPC: error with socket ', connectionId, e);
+          console.log('IPC: disconnecting', connectionId);
           forgetConnection();
         });
         stream.on('end', _ => {
-          console.log('disconnect', connection.id);
+          console.log('IPC: disconnect', connection.id);
           forgetConnection();
         });
       })
       .listen(socketFile);
   };
 
-  console.log('Checking for leftover socket.');
+  console.log('IPC: Checking for leftover socket.');
   fs.stat(SOCKETFILE, function (err, stats) {
     if (err) {
       // start server

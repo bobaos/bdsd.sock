@@ -40,8 +40,8 @@ const Sdk = (params) => {
           _params.stopBits = parseInt(_args[3]);
           serialPortParams = _params;
         } catch (e) {
-          console.log(`SDK: error parsing serialport params: ${params.serialPort.params}: ${e.message}`);
-          console.log('SDK: using default serialport parameters');
+          console.log(`BAOS: error parsing serialport params: ${params.serialPort.params}: ${e.message}`);
+          console.log('BAOS: using default serialport parameters');
           serialPortParams = Object.assign({}, defaultSerialPortParams);
         }
       }
@@ -161,7 +161,6 @@ const Sdk = (params) => {
     });
   };
 
-
   // programming mode
   self.setProgrammingMode = value => {
     return new Promise((resolve, reject) => {
@@ -177,7 +176,6 @@ const Sdk = (params) => {
     });
   };
 
-
   // 1. set server item for indication to false at beginning
   // 2. get description for all datapoints [1-1000].
   // 3. send GetServerItem request for "bus connected state" item.
@@ -188,10 +186,10 @@ const Sdk = (params) => {
     let value = state ? 1 : 0;
     bobaos.setServerItem(17, Buffer.alloc(1, value))
       .then(_ => {
-        console.log('SDK: success on setting indications to:', value);
+        console.log('BAOS: success on setting indications to:', value);
       })
       .catch(e => {
-        console.log('SDK: error while setting indications to:', value, e);
+        console.log('BAOS: error while setting indications to:', value, e);
       })
   };
   const getAllDatapointDescription = _ => {
@@ -199,7 +197,7 @@ const Sdk = (params) => {
       if (Array.isArray(payload)) {
         payload.forEach(t => {
           let datapoint = new Datapoint(t);
-          console.log('SDK: success on get datapoint description: { id:', datapoint.id, ', dpt: ', datapoint.dpt, '}');
+          console.log('BAOS: success on get datapoint description: { id:', datapoint.id, ', dpt: ', datapoint.dpt, '}');
           self.store.datapoints.push(datapoint);
           self.store.descriptions.push(t);
         });
@@ -231,18 +229,18 @@ const Sdk = (params) => {
         if (Array.isArray(payload)) {
           payload.forEach(t => {
             if (t.id === 10 && t.value.readUInt8(0) === 1) {
-              console.log('SDK: got bus state: connected');
+              console.log('BAOS: got bus state: connected');
               self.emit('connected');
             }
           })
         }
       })
       .catch(e => {
-        console.log('SDK: error while getting bus state', e);
+        console.log('BAOS: error while getting bus state', e);
       });
   };
   bobaos.on('open', _ => {
-    console.log('SDK: connected to baos');
+    console.log('BAOS: connected to baos');
     // get all descriptions and after that get bus state
     setIndications(false);
     getAllDatapointDescription();
@@ -250,7 +248,7 @@ const Sdk = (params) => {
     getBusState();
   });
   bobaos.on('reset', function () {
-    console.log('SDK: got reset ind');
+    console.log('BAOS: got reset ind');
     // on reset indication. e.g. when you downloaded new config from ETS
     // get all descriptions and after that get bus state
     setIndications(false);
@@ -273,7 +271,7 @@ const Sdk = (params) => {
         })
         .catch(e => {
           // should never be executed but anyway
-          console.log('SDK: error on DatapointValue.Ind', e);
+          console.log('BAOS: error on DatapointValue.Ind', e);
         });
     };
     if (Array.isArray(payload)) {
