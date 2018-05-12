@@ -34,12 +34,32 @@ Check if it executes correctly:
 
 ```
 $ bdsd.sock
-Checking for leftover socket.
-No leftover socket fount.
-Listening at /run/user/1000/bdsd.sock
-.....
-.....
-got bus state: connected
+IPC: Checking for leftover socket.
+IPC: No leftover socket found.
+IPC: Listening at  /run/user/1000/bdsd.sock
+BAOS: connected to baos
+BAOS: success on setting indications to: 0
+BAOS: success on get datapoint description: { id: 1 , dpt:  dpt9 }
+BAOS: success on get datapoint description: { id: 2 , dpt:  dpt5 }
+......
+......
+BAOS: success on get datapoint description: { id: 999 , dpt:  dpt16 }
+BAOS: success on get datapoint description: { id: 1000 , dpt:  dpt16 }
+BAOS: success on setting indications to: 1
+BAOS: got bus state: connected
+```
+
+Since version 2.0.0 bdsd.sock accepts command line arguments to ease running on different platforms.
+```
+$ bdsd.sock --help
+Options:
+  --help                   Show help                                   [boolean]
+  --version                Show version number                         [boolean]
+  --sockfile, -s           path to socket file. Default:
+                           /run/user/1000/bdsd.sock'
+  --serialport-device, -d  path to serialport device. Default: /dev/ttyAMA0
+  --serialport-params, -p  serialport parameters: "baud rate,parity,data
+                           bits,stop bits". Default: "19200,even,8,1"
 ```
 
 **2. Create systemd service folders, create service file**
