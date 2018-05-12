@@ -26,6 +26,7 @@
   "homepage": "https://github.com/shabunin/bdsd.sock#readme",
   "dependencies": {
     "bobaos": "^2.0.2",
-    "knx-dpts-baos": "^1.0.0"
+    "knx-dpts-baos": "^1.0.0",
+    "yargs": "^11.0.0"
   }
 }

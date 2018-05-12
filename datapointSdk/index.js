@@ -12,14 +12,15 @@ const Sdk = (params) => {
     descriptions: []
   };
 
-  // serialport params
+  // default serialport params
   let serialPortDevice = '/dev/ttyAMA0';
-  let serialPortParams = {
+  let defaultSerialPortParams = {
     baudRate: 19200,
     parity: "even",
     dataBits: 8,
     stopBits: 1
   };
+  let serialPortParams = Object.assign({}, defaultSerialPortParams);
   if (typeof params !== 'undefined') {
     if (params.serialPort !== null && typeof params.serialPort === 'object') {
       if (params.serialPort.device !== null && typeof params.serialPort.device === 'string') {
@@ -28,12 +29,26 @@ const Sdk = (params) => {
       if (params.serialPort.params !== null && typeof params.serialPort.params === 'object') {
         serialPortParams = params.serialPort.params;
       }
+      // now if params is a string '19200,even,8,1' we parse it
+      if (params.serialPort.params !== null && typeof params.serialPort.params === 'string') {
+        try {
+          let _params = {};
+          let _args = params.serialPort.params.split(',');
+          _params.baudRate = parseInt(_args[0]);
+          _params.parity = _args[1];
+          _params.dataBits = parseInt(_args[2]);
+          _params.stopBits = parseInt(_args[3]);
+          serialPortParams = _params;
+        } catch (e) {
+          console.log(`SDK: error parsing serialport params: ${params.serialPort.params}: ${e.message}`);
+          console.log('SDK: using default serialport parameters');
+          serialPortParams = Object.assign({}, defaultSerialPortParams);
+        }
+      }
     }
   }
   // init bobaos
   const bobaos = new Baos({serialPort: {device: serialPortDevice, params: serialPortParams}, debug: false});
-
-  // register events
 
   // Datapoint class
   const Datapoint = function (props) {
@@ -69,7 +84,6 @@ const Sdk = (params) => {
     });
   };
   Datapoint.prototype.getValue = function () {
-    // TODO: refactor
     const processValuePayload = t => {
       return new Promise((resolve, reject) => {
         let id = t.id;
@@ -109,7 +123,7 @@ const Sdk = (params) => {
         });
     });
   };
-  // to internal use. when we got value from bus put it to store
+  // to internal use. used to convert value from bus
   Datapoint.prototype._applyValue = function (value) {
     return new Promise((resolve, reject) => {
       let id = this.id;
@@ -174,10 +188,10 @@ const Sdk = (params) => {
     let value = state ? 1 : 0;
     bobaos.setServerItem(17, Buffer.alloc(1, value))
       .then(_ => {
-        console.log('success on setting indications to:', value);
+        console.log('SDK: success on setting indications to:', value);
       })
       .catch(e => {
-        console.log('error while setting indications to:', value, e);
+        console.log('SDK: error while setting indications to:', value, e);
       })
   };
   const getAllDatapointDescription = _ => {
@@ -185,7 +199,7 @@ const Sdk = (params) => {
       if (Array.isArray(payload)) {
         payload.forEach(t => {
           let datapoint = new Datapoint(t);
-          console.log('success on get datapoint description: { id:', datapoint.id, ', dpt: ', datapoint.dpt, '}');
+          console.log('SDK: success on get datapoint description: { id:', datapoint.id, ', dpt: ', datapoint.dpt, '}');
           self.store.datapoints.push(datapoint);
           self.store.descriptions.push(t);
         });
@@ -217,18 +231,18 @@ const Sdk = (params) => {
         if (Array.isArray(payload)) {
           payload.forEach(t => {
             if (t.id === 10 && t.value.readUInt8(0) === 1) {
-              console.log('got bus state: connected');
+              console.log('SDK: got bus state: connected');
               self.emit('connected');
             }
           })
         }
       })
       .catch(e => {
-        console.log('error while getting bus state', e);
+        console.log('SDK: error while getting bus state', e);
       });
   };
   bobaos.on('open', _ => {
-    console.log('connected to baos');
+    console.log('SDK: connected to baos');
     // get all descriptions and after that get bus state
     setIndications(false);
     getAllDatapointDescription();
@@ -236,7 +250,7 @@ const Sdk = (params) => {
     getBusState();
   });
   bobaos.on('reset', function () {
-    console.log('got reset ind');
+    console.log('SDK: got reset ind');
     // on reset indication. e.g. when you downloaded new config from ETS
     // get all descriptions and after that get bus state
     setIndications(false);
@@ -259,7 +273,7 @@ const Sdk = (params) => {
         })
         .catch(e => {
           // should never be executed but anyway
-          console.log('error on DatapointValue.Ind', e);
+          console.log('SDK: error on DatapointValue.Ind', e);
         });
     };
     if (Array.isArray(payload)) {

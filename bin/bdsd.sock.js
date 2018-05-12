@@ -1,3 +1,8 @@
 #!/usr/bin/env node 
 
-require('../index.js');
+// using default params
+let params = {
+  serialPortDevice: '/dev/ttyO1'
+};
+
+require('../index.js')(params);
