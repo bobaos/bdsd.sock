@@ -1,6 +1,6 @@
 {
   "name": "bdsd.sock",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Bobaos Datapoint Sdk Unix Domain Socket",
   "main": "index.js",
   "scripts": {
