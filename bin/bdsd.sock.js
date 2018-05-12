@@ -1,4 +1,5 @@
 #!/usr/bin/env node 
+const yargs = require('yargs');
 
 // using default params
 let params = {
