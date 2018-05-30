@@ -5,8 +5,7 @@ sudo npm install -g bdsd-cli --unsafe-perm
 
 SERVICE_NAME=bdsd.service
 
-mkdir $HOME/.config/systemd
-mkdir $HOME/.config/systemd/user
+mkdir -p $HOME/.config/systemd/user 
 touch $HOME/.config/systemd/user/$SERVICE_NAME
 
 SERVICE_PATH=$HOME/.config/systemd/user/$SERVICE_NAME
