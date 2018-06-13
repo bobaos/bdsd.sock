@@ -20,13 +20,13 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 ```
 ## Fields explanation
 
-### request_id
+### `request_id`
  
  field should be unique at the moment of sending and it is responsibility of client to process this value. Server sends responses with this value in response_id field back to client.
 
-### method field. 
+### `method` field.
 
-#### get datapoints
+#### `get datapoints`
 
  Get all configured datapoint descriptions.
  
@@ -38,7 +38,7 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":18052831966,"method":"get datapoints","payload":[{"id":1,"length":1,"flags":{"priority":"low","communication":true,"read":false,"write":true,"readOnInit":false,"transmit":true,"update":false},"dpt":"dpt1"},{"id":2,"length":1,"...}]}```
 
-#### get description
+#### `get description`
  
  Get description for datapoint with specified id.
  
@@ -50,7 +50,7 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":145663188249,"method":"get description","payload":{"id":31,"value":{"id":31,"dpt":"dpt5","flags":{"priority":"low","communication":true,"read":false,"write":true,"readOnInit":false,"transmit":true,"update":false},"length":1}},"success":true}```
 
-#### get value
+#### `get value`
  
  Get datapoint value.
  
@@ -62,7 +62,7 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":65362052157,"method":"get value","payload":{"id":31,"value":74},"success":true}```
 
-#### read value
+#### `read value`
  
  Send read request to KNX bus.
  
@@ -74,7 +74,7 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":611387384802,"method":"read value","payload":{"id":31},"success":true}```
 
-#### set value
+#### `set value`
 
  Set datapoint value and send to KNX bus.
  
@@ -86,7 +86,7 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
 
  ```{"response_id":839768583900,"method":"set value","payload":{"id":31},"success":true}```
 
-#### programming mode
+#### `programming mode`
 
  Set programming mode. As if you press PROG button.
  
@@ -97,7 +97,35 @@ Field \<DATA\> is stringified JSON object which shoud match next format in case 
  Response: 
  
  ```{"response_id":1366287859749,"method":"programming mode","success":true}```
- 
+
+#### `get stored value`
+
+ Get datapoint value.
+
+ Request:
+
+ ```{"request_id":65362052157,"method":"get stored value","payload":{"id":31}}```
+
+ Response:
+
+ ```{"response_id":65362052157,"method":"get stored value","payload":{"id":31,"value":74},"success":true}```
+
+### `read multiple`
+
+Read multiple datapoints.
+
+Request: ```{"request_id":175279505890,"method":"read multiple","payload":[1,105,106,107,108]}```
+
+Response: ```{"response_id":175279505890,"method":"read multiple","payload":[1,105,106,107,108],"success":true}```
+
+### `set multiple`
+
+Set multiple datapoints
+
+Request: ```{"request_id":1526404778316,"method":"set multiple","payload":[{"id":2,"value":false},{"id":999,"value":"hello, drug"}]}```
+
+Response: ```{"response_id":1526404778316,"method":"set multiple","payload":[{"id":2,"value":false},{"id":999,"value":"hello, drug"}],"success":true}```
+
 ## Broadcasting value.
 
 When datapoint value changes on bus, socket broadcasts following data to all connected clients:
