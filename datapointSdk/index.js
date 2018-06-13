@@ -117,10 +117,9 @@ const Sdk = (params) => {
   Datapoint.prototype.getStoredValue = function () {
     return new Promise((resolve, reject) => {
       let id = this.id;
-      // TODO: if value is null then getValue and send
       let value = this.value;
       if (value === null) {
-        console.log('no stored value yet, getting');
+        console.log(`SDK: no stored value for datapoint ${id} yet, getting`);
         this
           .getValue()
           .then(payload => {
@@ -211,7 +210,6 @@ const Sdk = (params) => {
         let values = payload.map(t => {
           let id = t.id;
           let value = t.value;
-          // console.log(self.store.descriptions);
           let dpt = self.store.descriptions.find(d => d.id === id)['dpt'];
           let encodedValue = DPTs[dpt].fromJS(value);
           return {id: id, value: encodedValue}
@@ -240,7 +238,6 @@ const Sdk = (params) => {
           let length = self.store.descriptions.find(i => i.id === t)['length'];
           return {id: t, length: length};
         });
-        console.log('values', values);
         bobaos
           .readMultipleDatapoints(values)
           .then(payload => {

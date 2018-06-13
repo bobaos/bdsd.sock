@@ -179,11 +179,10 @@ let BdsdSock = params => {
           if (!Array.isArray(request.payload)) {
             rejectResponse(new Error('For "read multiple" request payload should be array of ids.'));
           }
-          console.log(request);
           sdk
             .readMultipleValues(request.payload)
             .then(data => {
-              response.payload = data;
+              response.payload = request.payload;
               resolve(response);
             })
             .catch(e => {
@@ -232,11 +231,10 @@ let BdsdSock = params => {
           if (!Array.isArray(request.payload)) {
             rejectResponse(new Error('For "set multiple" request payload should be array of values.'));
           }
-          console.log(request);
           sdk
             .setMiltipleValues(request.payload)
             .then(data => {
-              response.payload = data;
+              response.payload = request.payload;
               resolve(response);
             })
             .catch(e => {
