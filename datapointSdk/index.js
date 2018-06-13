@@ -1,7 +1,7 @@
 // Bobaos Datapoint Sdk
 // collects datapoints information, provide methods to set, get, read values.
 const DPTs = require('knx-dpts-baos');
-const Baos = require('../../bobaos');
+const Baos = require('bobaos');
 const EE = require('events').EventEmitter;
 
 const Sdk = (params) => {
