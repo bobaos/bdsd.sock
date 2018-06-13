@@ -6,54 +6,9 @@ let busConnected = false;
 
 let BdsdSock = params => {
   // ipc, sdk instances
-  let ipc, sdk;
+  let sdk, ipc;
 
-  // now params for ipc
-  // it is only socket file path
-  // if it undefined then ipc/index.js will use following:
-  // process.env['XDG_RUNTIME_DIR'] + '/bdsd.sock'
-  let sockFile;
-  if (typeof params.sockFile !== 'undefined') {
-    sockFile = params.sockFile;
-  }
-  ipc = BdsdIpc(sockFile);
-
-  // params for sdk
-  // serialport parameters
-  // serialPortDevice: '/dev/ttyO1' for instance.
-  // if undefined, '/dev/ttyAMA0' will be used
-  // serialPortParams: '19200,even,8,1'
-  let serialPortDevice, serialPortParams;
-  if (typeof params.serialPortDevice !== 'undefined') {
-    serialPortDevice = params.serialPortDevice;
-  }
-  if (typeof params.serialPortParams !== 'undefined') {
-    serialPortParams = params.serialPortParams;
-  }
-  sdk = BdsdSdk({
-    serialPort:
-      {
-        device: serialPortDevice,
-        params: serialPortParams
-      }
-  });
-
-  // interprocess communication events
-  ipc.on('connected', (id, writeCb) => {
-    console.log('BDSD.SOCK: ipc connected: ', id);
-    if (busConnected) {
-      writeCb(JSON.stringify({
-        method: 'notify',
-        payload: 'bus connected'
-      }))
-    } else {
-      writeCb(JSON.stringify({
-        method: 'notify',
-        payload: 'bus disconnected'
-      }))
-    }
-  });
-
+  // process ipc request
   const processRequest = (connectionId, dataStr) => {
     return new Promise((resolve, reject) => {
       let response = {};
@@ -261,63 +216,122 @@ let BdsdSock = params => {
     });
   };
 
-  ipc.on('request', (data, connectionId, writeCb) => {
-    let dataStr = data.toString();
-    console.log('BDSD.SOCK: got request', dataStr);
-    processRequest(connectionId, dataStr)
-      .then(response => {
-        response.success = true;
-        writeCb(JSON.stringify(response));
-      })
-      .catch(e => {
-        let response = {};
-        if (Object.prototype.hasOwnProperty.call(e, 'response_id')) {
-          response.response_id = e.response_id;
+  const initIPC = _ => {
+    return new Promise((resolve, reject) => {
+      // now params for ipc
+      // it is only socket file path
+      // if it undefined then ipc/index.js will use following:
+      // process.env['XDG_RUNTIME_DIR'] + '/bdsd.sock'
+      let sockFile;
+      if (typeof params.sockFile !== 'undefined') {
+        sockFile = params.sockFile;
+      }
+      ipc = BdsdIpc(sockFile);
+
+      // interprocess communication events
+      ipc.on('connected', (id, writeCb) => {
+        console.log('BDSD.SOCK: ipc connected: ', id);
+        if (busConnected) {
+          writeCb(JSON.stringify({
+            method: 'notify',
+            payload: 'bus connected'
+          }))
+        } else {
+          writeCb(JSON.stringify({
+            method: 'notify',
+            payload: 'bus disconnected'
+          }))
         }
-        if (Object.prototype.hasOwnProperty.call(e, 'method')) {
-          response.method = e.method;
-        }
-        response.success = false;
-        response.error = e.error;
-        writeCb(JSON.stringify(response));
+        resolve(ipc);
       });
-  });
+      // on request
+      ipc.on('request', (data, connectionId, writeCb) => {
+        let dataStr = data.toString();
+        console.log('BDSD.SOCK: got request', dataStr);
+        processRequest(connectionId, dataStr)
+          .then(response => {
+            response.success = true;
+            writeCb(JSON.stringify(response));
+          })
+          .catch(e => {
+            let response = {};
+            if (Object.prototype.hasOwnProperty.call(e, 'response_id')) {
+              response.response_id = e.response_id;
+            }
+            if (Object.prototype.hasOwnProperty.call(e, 'method')) {
+              response.method = e.method;
+            }
+            response.success = false;
+            response.error = e.error;
+            writeCb(JSON.stringify(response));
+          });
+      });
+    });
+  };
 
-  // bobaos datapoint sdk events
-  sdk.on('connected', _ => {
-    busConnected = true;
-    ipc.broadcast(JSON.stringify({
-      method: 'notify',
-      payload: 'bus connected'
-    }));
-  });
+  const initSdk = _ => {
+    // params for sdk
+    // serialport parameters
+    // serialPortDevice: '/dev/ttyO1' for instance.
+    // if undefined, '/dev/ttyAMA0' will be used
+    // serialPortParams: '19200,even,8,1'
+    let serialPortDevice, serialPortParams;
+    if (typeof params.serialPortDevice !== 'undefined') {
+      serialPortDevice = params.serialPortDevice;
+    }
+    if (typeof params.serialPortParams !== 'undefined') {
+      serialPortParams = params.serialPortParams;
+    }
+    sdk = BdsdSdk({
+      serialPort:
+        {
+          device: serialPortDevice,
+          params: serialPortParams
+        }
+    });
+    sdk.on('error', err => {
+      console.log('BDSD.SOCK: error initializing bobaos sdk: ', err.message);
+      console.log('Terminating');
+      process.exit(0);
+    });
+    // bobaos datapoint sdk events
+    sdk.once('connected', _ => {
+      busConnected = true;
+      initIPC()
+        .then(_ => {
+          // on indication
+          sdk.on('DatapointValue.Ind', payload => {
+            let message = {};
+            message.method = 'cast value';
+            message.payload = payload;
+            ipc.broadcast(JSON.stringify(message));
+            console.log('BDSD.SOCK: broadcasting bus value', payload);
+          });
 
-  // on indication
-  sdk.on('DatapointValue.Ind', payload => {
-    let message = {};
-    message.method = 'cast value';
-    message.payload = payload;
-    ipc.broadcast(JSON.stringify(message));
-    console.log('BDSD.SOCK: broadcasting bus value', payload);
-  });
+          sdk.on('bus connected', _ => {
+            busConnected = true;
+            let message = {};
+            message.method = 'notify';
+            message.payload = 'bus connected';
+            ipc.broadcast(JSON.stringify(message));
+            console.log('BDSD.SOCK: bus connected');
+          });
 
-  sdk.on('bus connected', _ => {
-    busConnected = true;
-    let message = {};
-    message.method = 'notify';
-    message.payload = 'bus connected';
-    ipc.broadcast(JSON.stringify(message));
-    console.log('BDSD.SOCK: bus connected');
-  });
-
-  sdk.on('bus disconnected', _ => {
-    busConnected = false;
-    let message = {};
-    message.method = 'notify';
-    message.payload = 'bus disconnected';
-    ipc.broadcast(JSON.stringify(message));
-    console.log('BDSD.SOCK: bus disconnected');
-  });
+          sdk.on('bus disconnected', _ => {
+            busConnected = false;
+            let message = {};
+            message.method = 'notify';
+            message.payload = 'bus disconnected';
+            ipc.broadcast(JSON.stringify(message));
+            console.log('BDSD.SOCK: bus disconnected');
+          });
+        })
+        .catch(e => {
+          console.log('BDSD.SOCK: IPC init error: ', e);
+        })
+    });
+  };
+  initSdk();
 };
 
 module.exports = BdsdSock;

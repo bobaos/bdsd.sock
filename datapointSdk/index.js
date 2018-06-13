@@ -49,6 +49,9 @@ const Sdk = (params) => {
   }
   // init bobaos
   const bobaos = new Baos({serialPort: {device: serialPortDevice, params: serialPortParams}, debug: false});
+  bobaos.on('error', err => {
+    self.emit('error', err);
+  })
 
   // Datapoint class
   const Datapoint = function (props) {
