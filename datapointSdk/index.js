@@ -117,9 +117,22 @@ const Sdk = (params) => {
   Datapoint.prototype.getStoredValue = function () {
     return new Promise((resolve, reject) => {
       let id = this.id;
+      // TODO: if value is null then getValue and send
       let value = this.value;
-      let raw = this.raw;
-      resolve({id: id, value: value, raw: raw});
+      if (value === null) {
+        console.log('no stored value yet, getting');
+        this
+          .getValue()
+          .then(payload => {
+            resolve(payload);
+          })
+          .catch(e => {
+            reject(e);
+          });
+      } else {
+        let raw = this.raw;
+        resolve({id: id, value: value, raw: raw});
+      }
     })
   };
   Datapoint.prototype.readFromBus = function () {
