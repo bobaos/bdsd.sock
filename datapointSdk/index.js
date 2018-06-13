@@ -57,6 +57,7 @@ const Sdk = (params) => {
     this.flags = props.flags;
     this.length = props.length;
     this.value = null;
+    this.raw = null;
   };
   Datapoint.prototype.getDescription = function () {
     return new Promise((resolve, reject) => {
@@ -118,7 +119,7 @@ const Sdk = (params) => {
       let id = this.id;
       let value = this.value;
       let raw = this.raw;
-      resolve({id: id, value: value});
+      resolve({id: id, value: value, raw: raw});
     })
   };
   Datapoint.prototype.readFromBus = function () {
