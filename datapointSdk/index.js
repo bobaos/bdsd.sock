@@ -1,7 +1,7 @@
 // Bobaos Datapoint Sdk
 // collects datapoints information, provide methods to set, get, read values.
 const DPTs = require('knx-dpts-baos');
-const Baos = require('bobaos');
+const Baos = require('../../bobaos');
 const EE = require('events').EventEmitter;
 
 const Sdk = (params) => {
@@ -58,7 +58,7 @@ const Sdk = (params) => {
     this.length = props.length;
     this.value = null;
   };
-  Datapoint.prototype.getDescription = function() {
+  Datapoint.prototype.getDescription = function () {
     return new Promise((resolve, reject) => {
       resolve({
         id: this.id,
@@ -75,8 +75,12 @@ const Sdk = (params) => {
       try {
         let encodedValue = DPTs[dpt].fromJS(value);
         bobaos.setDatapointValue(id, encodedValue)
-          .then(resolve)
-          .catch(reject);
+          .then(payload => {
+            resolve(payload);
+          })
+          .catch(e => {
+            reject(e);
+          });
       } catch (e) {
         reject(e);
       }
@@ -109,6 +113,14 @@ const Sdk = (params) => {
         return processValuePayload(payload[0]);
       })
   };
+  Datapoint.prototype.getStoredValue = function () {
+    return new Promise((resolve, reject) => {
+      let id = this.id;
+      let value = this.value;
+      let raw = this.raw;
+      resolve({id: id, value: value});
+    })
+  };
   Datapoint.prototype.readFromBus = function () {
     return new Promise((resolve, reject) => {
       let id = this.id;
@@ -130,6 +142,7 @@ const Sdk = (params) => {
       let dpt = this.dpt;
       try {
         this.value = DPTs[dpt].toJS(value);
+        this.raw = value;
         resolve({value: this.value, raw: value});
       } catch (e) {
         reject(e);
@@ -176,6 +189,57 @@ const Sdk = (params) => {
     });
   };
 
+  self.setMiltipleValues = (payload) => {
+    return new Promise((resolve, reject) => {
+      //  TODO: setMultipleValues
+      try {
+        // objects we want to send to bobaos
+        let values = payload.map(t => {
+          let id = t.id;
+          let value = t.value;
+          // console.log(self.store.descriptions);
+          let dpt = self.store.descriptions.find(d => d.id === id)['dpt'];
+          let encodedValue = DPTs[dpt].fromJS(value);
+          return {id: id, value: encodedValue}
+        });
+        bobaos
+          .setMultipleValues(values)
+          .then(payload => {
+            resolve(payload);
+          })
+          .catch(e => {
+            reject(e);
+          });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+
+  self.readMultipleValues = payload => {
+    return new Promise((resolve, reject) => {
+      //  TODO: readMultipleValues
+      try {
+        // objects we want to send to bobaos
+        // [{id: 1, length: 2}]
+        let values = payload.map(t => {
+          let length = self.store.descriptions.find(i => i.id === t)['length'];
+          return {id: t, length: length};
+        });
+        console.log('values', values);
+        bobaos
+          .readMultipleDatapoints(values)
+          .then(payload => {
+            resolve(payload);
+          })
+          .catch(e => {
+            reject(e);
+          });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
   // 1. set server item for indication to false at beginning
   // 2. get description for all datapoints [1-1000].
   // 3. send GetServerItem request for "bus connected state" item.

@@ -136,6 +136,24 @@ let BdsdSock = params => {
               rejectResponse(e);
             });
           break;
+        case 'get stored value':
+          requireField(request, 'payload');
+          requireField(request.payload, 'id');
+          sdk
+            .findDatapoint(request.payload.id)
+            .then(datapoint => {
+              datapoint
+                .getStoredValue()
+                .then(data => {
+                  response.payload = {
+                    id: request.payload.id,
+                    value: data.value,
+                    raw: data.raw
+                  };
+                  resolve(response);
+                })
+            });
+          break;
         case 'read value':
           requireField(request, 'payload');
           requireField(request.payload, 'id');
@@ -151,6 +169,22 @@ let BdsdSock = params => {
                 .catch(e => {
                   rejectResponse(e);
                 });
+            })
+            .catch(e => {
+              rejectResponse(e);
+            });
+          break;
+        case 'read multiple':
+          requireField(request, 'payload');
+          if (!Array.isArray(request.payload)) {
+            rejectResponse(new Error('For "read multiple" request payload should be array of ids.'));
+          }
+          console.log(request);
+          sdk
+            .readMultipleValues(request.payload)
+            .then(data => {
+              response.payload = data;
+              resolve(response);
             })
             .catch(e => {
               rejectResponse(e);
@@ -193,6 +227,23 @@ let BdsdSock = params => {
               rejectResponse(e);
             });
           break;
+        case 'set multiple':
+          requireField(request, 'payload');
+          if (!Array.isArray(request.payload)) {
+            rejectResponse(new Error('For "set multiple" request payload should be array of values.'));
+          }
+          console.log(request);
+          sdk
+            .setMiltipleValues(request.payload)
+            .then(data => {
+              response.payload = data;
+              resolve(response);
+            })
+            .catch(e => {
+              rejectResponse(e);
+            });
+          break;
+
         case 'programming mode':
           requireField(request, 'payload');
           requireField(request.payload, 'value');
