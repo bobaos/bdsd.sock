@@ -85,9 +85,12 @@ let BdsdIPC = socketFileParam => {
       return;
     }
     // remove file then start server
-    console.log(`IPC: ${SOCKETFILE} already exist. If you don't have bdsd.sock instance running, try to remove this file and restart app.`);
-    console.log('\n', 'IPC: Terminating.', '\n');
-    process.exit(0);
+    console.log(`IPC: ${SOCKETFILE} already exist. Removing.`);
+    fs.unlink(SOCKETFILE, (err) => {
+      if (err) throw err;
+      console.log('IPC: Listening at ', SOCKETFILE);
+      server = createServer(SOCKETFILE);
+    });
   });
 
   // close all connections when the user does CTRL-C
