@@ -1,26 +1,39 @@
 #!/usr/bin/env node
 
-// commandline arguments
-const argv = require('yargs')
-  .option('sockfile', {
-    alias: 's',
-    describe: `path to socket file. Default: ${process.env['XDG_RUNTIME_DIR']}/bdsd.sock'`,
-  })
-  .option('serialport-device', {
-    alias: 'd',
-    describe: 'path to serialport device. Default: /dev/ttyAMA0',
-  })
-  .option('serialport-params', {
-    alias: 'p',
-    describe: 'serialport parameters: "baud rate,parity,data bits,stop bits". Default: "19200,even,8,1"',
-  })
-  .argv;
+const program = require('commander');
+
+program
+  .option(
+    '-s --sockfile <path>',
+    `path to socket file. Default: ${process.env['XDG_RUNTIME_DIR']}/bdsd.sock`
+  )
+  .option(
+    '-d --device <path>',
+    `path to serialport device. Default: /dev/ttyAMA0`
+  )
+  .option(
+    '-p --params [value]',
+    `serialport parameters: "baud rate, parity, data bits, stop bits". Default: "19200,even,8,1"`
+  )
+  .parse(process.argv);
 
 // using default params
 let params = {
-  sockFile: argv['sockfile'],
-  serialPortDevice: argv['serialport-device'],
-  serialPortParams: argv['serialport-params']
+  sockFile: `${process.env['XDG_RUNTIME_DIR']}/bdsd.sock`,
+  serialPortDevice: `/dev/ttyAMA0`,
+  serialPortParams: `19200,even,8,1`
 };
+
+if (program['sockfile']) {
+  params.sockFile = program['sockfile'];
+}
+if (program['device']) {
+  params.serialPortDevice = program['device'];
+}
+if (program['params']) {
+  params.serialPortParams = program['params'];
+}
+
+console.log(params);
 
 require('../index.js')(params);
