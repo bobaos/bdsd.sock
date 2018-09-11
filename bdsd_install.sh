@@ -20,6 +20,7 @@ echo "[Unit]" > $SERVICE_PATH
 echo "Description=Bobaos Datapoint Sdk Daemon" >> $SERVICE_PATH
 echo "[Service]" >> $SERVICE_PATH
 echo "ExecStart=/usr/bin/env bdsd.sock" >> $SERVICE_PATH
+echo "StandardOutput=null" >> $SERVICE_PATH
 echo "[Install]" >> $SERVICE_PATH
 echo "WantedBy=default.target" >> $SERVICE_PATH
 
