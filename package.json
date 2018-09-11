@@ -14,7 +14,10 @@
     "type": "git",
     "url": "git+https://github.com/shabunin/bdsd.sock.git"
   },
-  "keywords": ["knx", "baos"],
+  "keywords": [
+    "knx",
+    "baos"
+  ],
   "author": "Vladimir Shabunin",
   "license": "DBAD",
   "bugs": {
