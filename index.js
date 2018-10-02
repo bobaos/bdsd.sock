@@ -297,9 +297,6 @@ let BdsdSock = params => {
     // bobaos datapoint sdk events
     sdk.on("connected", _ => {
       busConnected = true;
-      sdk.removeAllListeners("DatapointValue.Ind");
-      sdk.removeAllListeners("bus connected");
-      sdk.removeAllListeners("bus disconnected");
     });
     sdk.on("DatapointValue.Ind", payload => {
       let message = {};

@@ -51,7 +51,7 @@ const Sdk = (params) => {
   const bobaos = new Baos({serialPort: {device: serialPortDevice, params: serialPortParams}, debug: false});
   bobaos.on('error', err => {
     self.emit('error', err);
-  })
+  });
 
   // Datapoint class
   const Datapoint = function (props) {
@@ -260,15 +260,14 @@ const Sdk = (params) => {
   // 4. enable indications
   // enable/disable indications steps are done to be
   // sure that we have all datapoint descr when got ind event
-  const setIndications = function (state) {
+  const setIndications = async state => {
     let value = state ? 1 : 0;
-    bobaos.setServerItem(17, Buffer.alloc(1, value))
-      .then(_ => {
-        console.log('BAOS: success on setting indications to:', value);
-      })
-      .catch(e => {
-        console.log('BAOS: error while setting indications to:', value, e);
-      })
+    try {
+      await bobaos.setServerItem(17, Buffer.alloc(1, value));
+      console.log('BAOS: success on setting indications to:', value);
+    } catch(e) {
+      console.log('BAOS: error while setting indications to:', value, e);
+    }
   };
   const getAllDatapointDescription = _ => {
     const processDatapointDescription = payload => {
@@ -317,21 +316,21 @@ const Sdk = (params) => {
         console.log('BAOS: error while getting bus state', e);
       });
   };
-  bobaos.on('open', _ => {
+  bobaos.on('open', async _ => {
     console.log('BAOS: connected to baos');
     // get all descriptions and after that get bus state
-    setIndications(false);
+    await setIndications(false);
     getAllDatapointDescription();
-    setIndications(true);
+    await setIndications(true);
     getBusState();
   });
-  bobaos.on('reset', function () {
+  bobaos.on('reset', async _ => {
     console.log('BAOS: got reset ind');
     // on reset indication. e.g. when you downloaded new config from ETS
     // get all descriptions and after that get bus state
-    setIndications(false);
+    await setIndications(false);
     getAllDatapointDescription();
-    setIndications(true);
+    await setIndications(true);
     getBusState();
   });
   // now process value indications
