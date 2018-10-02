@@ -269,7 +269,7 @@ let BdsdSock = params => {
     });
   };
 
-  const initSdk = _ => {
+  const initSdk = async _ => {
     // params for sdk
     // serialport parameters
     // serialPortDevice: '/dev/ttyO1' for instance.
@@ -282,6 +282,7 @@ let BdsdSock = params => {
     if (typeof params.serialPortParams !== "undefined") {
       serialPortParams = params.serialPortParams;
     }
+    await initIPC();
     sdk = BdsdSdk({
       serialPort: {
         device: serialPortDevice,
@@ -299,38 +300,31 @@ let BdsdSock = params => {
       sdk.removeAllListeners("DatapointValue.Ind");
       sdk.removeAllListeners("bus connected");
       sdk.removeAllListeners("bus disconnected");
-      initIPC()
-        .then(_ => {
-          // on indication
-          sdk.on("DatapointValue.Ind", payload => {
-            let message = {};
-            message.method = "cast value";
-            message.payload = payload;
-            ipc.broadcast(JSON.stringify(message));
-            console.log("BDSD.SOCK: broadcasting bus value", payload);
-          });
+    });
+    sdk.on("DatapointValue.Ind", payload => {
+      let message = {};
+      message.method = "cast value";
+      message.payload = payload;
+      ipc.broadcast(JSON.stringify(message));
+      console.log("BDSD.SOCK: broadcasting bus value", payload);
+    });
 
-          sdk.on("bus connected", _ => {
-            busConnected = true;
-            let message = {};
-            message.method = "notify";
-            message.payload = "bus connected";
-            ipc.broadcast(JSON.stringify(message));
-            console.log("BDSD.SOCK: bus connected");
-          });
+    sdk.on("bus connected", _ => {
+      busConnected = true;
+      let message = {};
+      message.method = "notify";
+      message.payload = "bus connected";
+      ipc.broadcast(JSON.stringify(message));
+      console.log("BDSD.SOCK: bus connected");
+    });
 
-          sdk.on("bus disconnected", _ => {
-            busConnected = false;
-            let message = {};
-            message.method = "notify";
-            message.payload = "bus disconnected";
-            ipc.broadcast(JSON.stringify(message));
-            console.log("BDSD.SOCK: bus disconnected");
-          });
-        })
-        .catch(e => {
-          console.log("BDSD.SOCK: IPC init error: ", e);
-        });
+    sdk.on("bus disconnected", _ => {
+      busConnected = false;
+      let message = {};
+      message.method = "notify";
+      message.payload = "bus disconnected";
+      ipc.broadcast(JSON.stringify(message));
+      console.log("BDSD.SOCK: bus disconnected");
     });
   };
   initSdk();
