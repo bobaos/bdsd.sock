@@ -83,7 +83,7 @@ let BdsdIPC = socketFileParam => {
       console.log("IPC: Listening at ", SOCKETFILE);
       server = createServer(SOCKETFILE);
       if (server) {
-        self.emit("ready");
+        ipc.emit("ready");
       }
       return;
     }
@@ -94,7 +94,7 @@ let BdsdIPC = socketFileParam => {
       console.log("IPC: Listening at ", SOCKETFILE);
       server = createServer(SOCKETFILE);
       if (server) {
-        self.emit("ready");
+        ipc.emit("ready");
       }
     });
   });
