@@ -224,6 +224,8 @@ let BdsdSock = params => {
       }
       ipc = BdsdIpc(sockFile);
 
+      ipc.on("ready", resolve);
+
       // interprocess communication events
       ipc.on("connected", (id, writeCb) => {
         console.log("BDSD.SOCK: ipc connected: ", id);
@@ -242,7 +244,6 @@ let BdsdSock = params => {
             })
           );
         }
-        resolve(ipc);
       });
       // on request
       ipc.on("request", (data, connectionId, writeCb) => {
