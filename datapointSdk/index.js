@@ -347,7 +347,6 @@ const Sdk = (params) => {
           self.emit('DatapointValue.Ind', {id: id, value: payload.value, raw: payload.raw});
         })
         .catch(e => {
-          // should never be executed but anyway
           console.log('BAOS: error on DatapointValue.Ind', e);
         });
     };

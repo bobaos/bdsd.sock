@@ -83,6 +83,7 @@ let BdsdIPC = socketFileParam => {
       console.log("IPC: Listening at ", SOCKETFILE);
       server = createServer(SOCKETFILE);
       if (server) {
+        console.log("IPC: emitting ready state");
         ipc.emit("ready");
       }
       return;
@@ -94,6 +95,7 @@ let BdsdIPC = socketFileParam => {
       console.log("IPC: Listening at ", SOCKETFILE);
       server = createServer(SOCKETFILE);
       if (server) {
+        console.log("IPC: emitting ready state");
         ipc.emit("ready");
       }
     });

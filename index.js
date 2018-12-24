@@ -4,7 +4,7 @@ const BdsdSdk = require("./datapointSdk/index");
 
 let busConnected = false;
 
-let BdsdSock = params => {
+let BdsdSock = async params => {
   // ipc, sdk instances
   let sdk, ipc;
 
@@ -325,7 +325,7 @@ let BdsdSock = params => {
       console.log("BDSD.SOCK: bus disconnected");
     });
   };
-  initSdk();
+  await initSdk();
 };
 
 module.exports = BdsdSock;
